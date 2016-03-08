@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,12 +15,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import com.misao.todolist.db.TaskContract;
 import com.misao.todolist.db.TaskDBHelper;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends AppCompatActivity {
 
     private TaskDBHelper helper;
     private ListAdapter listAdapter;
@@ -36,7 +38,7 @@ public class MainActivity extends ListActivity {
         SQLiteDatabase sqlDB = helper.getReadableDatabase();
         Cursor cursor = sqlDB.query(TaskContract.TABLE,
                 new String[]{TaskContract.Columns._ID, TaskContract.Columns.TASK},
-                null,null,null,null,null);
+                null, null, null, null, null);
 
         listAdapter = new SimpleCursorAdapter(
                 this,
@@ -46,7 +48,8 @@ public class MainActivity extends ListActivity {
                 new int[] { R.id.taskTextView},
                 0
         );
-        this.setListAdapter(listAdapter);
+        ListView listView = (ListView) findViewById(R.id.list);
+        listView.setAdapter(listAdapter);
     }
 
     @Override
@@ -77,11 +80,11 @@ public class MainActivity extends ListActivity {
 
                         ContentValues values = new ContentValues();
                         values.clear();
-                        values.put(TaskContract.Columns.TASK,task);
+                        values.put(TaskContract.Columns.TASK, task);
 
                         db.insertWithOnConflict(TaskContract.TABLE, null, values,
                                 SQLiteDatabase.CONFLICT_IGNORE);
-                        
+
                         updateUI();
                     }
                 });
