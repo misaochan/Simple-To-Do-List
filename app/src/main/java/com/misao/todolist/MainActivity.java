@@ -1,6 +1,7 @@
 package com.misao.todolist;
 
 import android.annotation.SuppressLint;
+import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -12,29 +13,40 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.SimpleCursorAdapter;
 
 import com.misao.todolist.db.TaskContract;
 import com.misao.todolist.db.TaskDBHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ListActivity {
 
     private TaskDBHelper helper;
+    private ListAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        updateUI();
+    }
 
-        SQLiteDatabase sqlDB = new TaskDBHelper(this).getWritableDatabase();
-        @SuppressLint("Recycle")
+    private void updateUI() {
+        helper = new TaskDBHelper(MainActivity.this);
+        SQLiteDatabase sqlDB = helper.getReadableDatabase();
         Cursor cursor = sqlDB.query(TaskContract.TABLE,
-                new String[]{TaskContract.Columns.TASK},
+                new String[]{TaskContract.Columns._ID, TaskContract.Columns.TASK},
                 null,null,null,null,null);
 
-        cursor.moveToFirst();
-        while(cursor.moveToNext()) {
-            Log.d("MainActivity cursor", cursor.getString(cursor.getColumnIndexOrThrow(TaskContract.Columns.TASK)));
-        }
+        listAdapter = new SimpleCursorAdapter(
+                this,
+                R.layout.task_view,
+                cursor,
+                new String[] { TaskContract.Columns.TASK},
+                new int[] { R.id.taskTextView},
+                0
+        );
+        this.setListAdapter(listAdapter);
     }
 
     @Override
@@ -69,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
                         db.insertWithOnConflict(TaskContract.TABLE, null, values,
                                 SQLiteDatabase.CONFLICT_IGNORE);
+                        
+                        updateUI();
                     }
                 });
                 builder.setNegativeButton("Cancel",null);
