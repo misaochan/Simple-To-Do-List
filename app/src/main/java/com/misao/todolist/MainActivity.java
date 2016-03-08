@@ -13,10 +13,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.misao.todolist.db.TaskContract;
 import com.misao.todolist.db.TaskDBHelper;
@@ -50,6 +52,22 @@ public class MainActivity extends AppCompatActivity {
         );
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(listAdapter);
+    }
+
+    public void onDoneButtonClick(View view) {
+        View v = (View) view.getParent();
+        TextView taskTextView = (TextView) v.findViewById(R.id.taskTextView);
+        String task = taskTextView.getText().toString();
+
+        String sql = String.format("DELETE FROM %s WHERE %s = '%s'",
+                TaskContract.TABLE,
+                TaskContract.Columns.TASK,
+                task);
+
+        helper = new TaskDBHelper(MainActivity.this);
+        SQLiteDatabase sqlDB = helper.getWritableDatabase();
+        sqlDB.execSQL(sql);
+        updateUI();
     }
 
     @Override
