@@ -1,6 +1,9 @@
 package com.misao.todolist;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.app.ListActivity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -81,44 +84,52 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_task:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Add a task");
-
-                LayoutInflater inflater = this.getLayoutInflater();
-
-                final EditText inputField = (EditText)findViewById(R.id.add_item);
-                builder.setView(inflater.inflate(R.layout.additem_dialog, null));
-
-
-
-
-
-                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Log.d("edittext", inputField.getText().toString());
-                        String task = inputField.getText().toString();
-                        Log.d("Task entered: ", task);
-
-                        TaskDBHelper helper = new TaskDBHelper(MainActivity.this);
-                        SQLiteDatabase db = helper.getWritableDatabase();
-
-                        ContentValues values = new ContentValues();
-                        values.clear();
-                        values.put(TaskContract.Columns.TASK, task);
-
-                        db.insertWithOnConflict(TaskContract.TABLE, null, values,
-                                SQLiteDatabase.CONFLICT_IGNORE);
-
-                        updateUI();
-                    }
-                });
-                builder.setNegativeButton("Cancel",null);
-                builder.create().show();
+                FragmentManager fm = getFragmentManager();
+                AddItemDialogFragment dialogFragment = new AddItemDialogFragment();
+                dialogFragment.show(fm, "Sample Fragment");
                 return true;
 
             default:
                 return false;
         }
     }
+
+    private class AddItemDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            builder.setTitle("Add a task");
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+
+            builder.setView(inflater.inflate(R.layout.additem_dialog, null));
+            final EditText inputField = (EditText)findViewById(R.id.add_item);
+
+            builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Log.d("edittext", inputField.getText().toString());
+                    String task = inputField.getText().toString();
+                    Log.d("Task entered: ", task);
+
+                    TaskDBHelper helper = new TaskDBHelper(MainActivity.this);
+                    SQLiteDatabase db = helper.getWritableDatabase();
+
+                    ContentValues values = new ContentValues();
+                    values.clear();
+                    values.put(TaskContract.Columns.TASK, task);
+
+                    db.insertWithOnConflict(TaskContract.TABLE, null, values,
+                            SQLiteDatabase.CONFLICT_IGNORE);
+
+                    updateUI();
+                }
+            });
+            builder.setNegativeButton("Cancel", null);
+            return builder.create();
+
+        }
+    }
+
 }
