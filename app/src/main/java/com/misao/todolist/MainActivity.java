@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -82,16 +83,22 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_add_task:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Add a task");
-                builder.setMessage("What do you want to do?");
 
-                final EditText inputField = new EditText(this);
-                builder.setView(inputField);
+                LayoutInflater inflater = this.getLayoutInflater();
+
+                final EditText inputField = (EditText)findViewById(R.id.add_item);
+                builder.setView(inflater.inflate(R.layout.additem_dialog, null));
+
+
+
+
 
                 builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.d("edittext", inputField.getText().toString());
                         String task = inputField.getText().toString();
-                        Log.d("Task entered: ",task);
+                        Log.d("Task entered: ", task);
 
                         TaskDBHelper helper = new TaskDBHelper(MainActivity.this);
                         SQLiteDatabase db = helper.getWritableDatabase();
