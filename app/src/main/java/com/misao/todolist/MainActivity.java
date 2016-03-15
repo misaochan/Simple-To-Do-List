@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_task:
+                //When you are using android.support.v4.app.FragmentManager then you should use getSupportFragmentManager()
                 FragmentManager fm = getSupportFragmentManager();
                 AddItemDialogFragment dialogFragment = new AddItemDialogFragment();
                 dialogFragment.show(fm, "Sample Fragment");
@@ -98,21 +99,20 @@ public class MainActivity extends AppCompatActivity {
     public class AddItemDialogFragment extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
             builder.setTitle("Add a task");
-            LayoutInflater inflater = getActivity().getLayoutInflater();
 
+            //Inflates the custom dialog that contains the EditText item and sets the view
+            LayoutInflater inflater = getActivity().getLayoutInflater();
             View view = inflater.inflate(R.layout.additem_dialog, null);
             builder.setView(view);
 
+            //findViewById needs to be called on the saved view
             final EditText inputField = (EditText) view.findViewById(R.id.add_item);
 
             builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    Log.d("edittext", inputField.getText().toString());
                     String task = inputField.getText().toString();
                     Log.d("Task entered: ", task);
 
@@ -131,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
             });
             builder.setNegativeButton("Cancel", null);
             return builder.create();
-
         }
     }
-
 }
